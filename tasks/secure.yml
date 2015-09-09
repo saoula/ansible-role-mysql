@@ -1,0 +1,32 @@
+---
+- name: set the root password
+  mysql_user:
+    user: root
+    host: "{{item}}"
+    password: "{{mysql_root_password}}"
+    login_user: root
+    check_implicit_admin: yes
+    login_password: "{{mysql_root_password}}"
+  with_items:
+    - 127.0.0.1
+    - ::1
+    - localhost
+    - "{{ansible_hostname}}"
+
+- name: remove anonymous MySQL server user
+  mysql_user:
+    name: ""
+    host: "{{item}}"
+    state: absent
+    login_user: root
+    login_password: "{{mysql_root_password}}"
+  with_items:
+    - "{{ansible_hostname}}"
+    - localhost
+
+- name: remove the test database
+  mysql_db:
+    name: test
+    state: absent
+    login_user: root
+    login_password: "{{mysql_root_password}}"
